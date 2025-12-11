@@ -9,19 +9,20 @@ from .utils.nodes import (
     chart_request,
     chatbot,
     data_review,
-    food_entry,
     pick_node,
     router_node,
 )
 from .utils.state import AgentState
+from .utils.subgraph import subgraph as food_subgraph
 
 builder = StateGraph(AgentState)
 
 builder.add_node("router", router_node)
 builder.add_node("chatbot", chatbot)
-builder.add_node("food_entry", food_entry)
+builder.add_node("food_entry", food_subgraph)
 builder.add_node("data_review", data_review)
 builder.add_node("chart_request", chart_request)
+
 
 builder.add_edge(START, "router")
 builder.add_conditional_edges(
@@ -81,7 +82,5 @@ while True:
         stream_graph_updates(user_input)
     except (EOFError, KeyboardInterrupt):
         # fallback if input() is not available
-        user_input = "What do you know about LangGraph?"
-        print("User: " + user_input)
-        stream_graph_updates(user_input)
+        print("An exit signal was received. Exiting the program.")
         break
