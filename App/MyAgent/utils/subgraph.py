@@ -1,4 +1,4 @@
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, ToolMessage
 from langgraph.graph import START, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
@@ -9,7 +9,7 @@ from .tools import save_food_to_db, search_usda_foods
 
 # Using default model and binding food-related tools
 tools = [search_usda_foods, save_food_to_db]
-food_model = get_model(temperature=0.4).bind_tools(tools)
+food_model = get_model(temperature=0.3).bind_tools(tools)
 
 
 def food_agent_node(state: AgentState):
@@ -27,7 +27,10 @@ def food_agent_node(state: AgentState):
 ### Step 1: Extract Information
 - Extract the FOOD ITEM from the user's message
 - Extract the QUANTITY (e.g., "2 eggs", "1 cup of rice", "150g chicken")
+- NOTE: You only use grams (g), milliliters (ml), NOT ounces (oz) or pounds (lbs)
 - If quantity is not specified, ask the user before proceeding
+- **DON'T** ask for exact weights or specific types repeatedly
+- **DO** make smart assumptions
 
 ### Step 2: Search for Food Data
 - Use 'search_usda_foods' with a concise food description
@@ -49,6 +52,7 @@ def food_agent_node(state: AgentState):
   - The user's specified quantity
   - source='usda' if from search, source='llm_estimation' if estimated
   - Accurate nutritional values adjusted for quantity
+  - meal_type: If the user mentions a meal context (e.g., "for breakfast", "lunch"), set meal_type accordingly (breakfast/lunch/dinner/snack). Otherwise, leave it as null.
 
 ### Step 5: Confirm
 - Tell the user the food has been logged with a summary
@@ -59,6 +63,12 @@ def food_agent_node(state: AgentState):
 - ALWAYS wait for search results before deciding next steps
 - If user says "yes", "confirm", "ok", "save it" → proceed to save
 - If user says "no", "cancel", "wrong" → ask what to change
+
+## YOUR PERSONALITY:
+- Be helpful and casual, NOT annoying or pedantic
+- Users don't have perfect information — that's OK!
+- Make reasonable assumptions when details are missing
+- Keep responses SHORT and friendly
 """,
     )
 
@@ -66,7 +76,36 @@ def food_agent_node(state: AgentState):
 
     # Create a new message list with the system message and the food request
     response = food_model.invoke(messages)
-    return {"messages": [response]}
+
+    # Check if this response is calling save_food_to_db tool
+    # has_save_call = (
+    #     hasattr(response, "tool_calls")  # 1) check if response has tool_calls attribute
+    #     and response.tool_calls  # 2) ensure tool_calls is not None
+    #     and any(
+    #         tc["name"] == "save_food_to_db" for tc in response.tool_calls
+    #     )  # 3) check for save_food_to_db call
+    # )
+
+    # Check if the last message was the agent calling save_food_to_db
+    just_saved = False
+    if len(state["messages"]) >= 2:
+        last_ToolMessage = state["messages"][-1]
+        if (
+            isinstance(last_ToolMessage, ToolMessage)
+            and last_ToolMessage.content == "Success"
+        ):
+            just_saved = True
+
+    # Update food_record_state based on what the agent is doing
+    if just_saved:
+        # Agent is saving → will be done after tool executes
+        print("🤖 Agent has saved food to the database")
+        new_state = None
+    else:
+        # Agent is searching or asking questions → still pending
+        new_state = "awaiting_confirmation"
+
+    return {"messages": [response], "food_record_state": new_state}
 
 
 usda_builder = StateGraph(AgentState)

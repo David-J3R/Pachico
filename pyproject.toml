@@ -5,11 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "alembic>=1.15.0",
     "instructor>=1.13.0",
     "langchain-openai>=1.1.1",
     "langgraph>=1.0.4",
     "langgraph-checkpoint-sqlite>=3.0.0",
     "openai>=2.9.0",
+    "psycopg2-binary>=2.9.10",
     "pydantic>=2.12.5",
     "pydantic-settings>=2.12.0",
     "python-dotenv>=1.2.1",

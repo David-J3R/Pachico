@@ -4,7 +4,7 @@ from App.MyAgent.clients.model import get_instructor, get_model
 
 from .state import AgentState, RouterChoice
 
-model = get_model("amazon/nova-2-lite-v1:free")
+model = get_model()
 # -------------------------------------------
 # NODES
 # -------------------------------------------
@@ -17,6 +17,11 @@ def router_node(state: AgentState):
     """
 
     last_message = state["messages"][-1].content
+
+    # Check if food_entry subgraph should continue waiting for confirmation
+    if state.get("food_record_state") == "awaiting_confirmation":
+        print("Router continuing to food_entry")
+        return {"decision": "food_entry"}
 
     decision = cast(
         RouterChoice,

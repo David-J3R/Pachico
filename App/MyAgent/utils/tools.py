@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 from langchain_core.tools import tool
 
+from App.database import FoodEntry, get_db_session
 from App.MyAgent.clients.usda_api import USDAClient
 
 usda_client = USDAClient()
@@ -57,6 +58,7 @@ def save_food_to_db(
     user_id: int = 1,
     fdc_id: Optional[int] = None,
     source: Literal["usda", "llm_estimation"] = "usda",
+    meal_type: Optional[Literal["breakfast", "lunch", "dinner", "snack"]] = None,
 ):
     """
     Saves the food item to the user's daily record.
@@ -74,13 +76,29 @@ def save_food_to_db(
         user_id: User identifier (default: 1)
         fdc_id: USDA FoodData Central ID (if from USDA search, otherwise None)
         source: "usda" if from database, "llm_estimation" if estimated
+        meal_type: Meal category if mentioned (breakfast, lunch, dinner, snack). Leave None if not specified.
 
     Returns:
         "Success" if saved successfully
     """
+    entry = FoodEntry(
+        user_id=user_id,
+        food_description=food_description,
+        calories=calories,
+        protein_g=protein_g,
+        fat_g=fat_g,
+        carbs_g=carbs_g,
+        quantity=quantity,
+        unit=unit,
+        fdc_id=fdc_id,
+        source=source,
+        meal_type=meal_type,
+    )
 
-    # Here you would connect to your SQL/NoSQL DB
+    with get_db_session() as session:
+        session.add(entry)
+
     print(
-        f"💾 SAVING: {food_description} | {calories} kcal | Protein: {protein_g}g | Fat: {fat_g}g | Carbs: {carbs_g}g | Quantity: {quantity} {unit} | User ID: {user_id} | FDC ID: {fdc_id} | Source: {source}"
+        f"💾 SAVED: {food_description} | {calories} kcal | {quantity} {unit} | meal: {meal_type}"
     )
     return "Success"

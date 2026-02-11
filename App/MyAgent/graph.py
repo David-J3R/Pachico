@@ -1,6 +1,7 @@
 import os
 from typing import cast
 
+from langchain_core.messages import HumanMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
@@ -12,7 +13,7 @@ from .utils.nodes import (
     pick_node,
     router_node,
 )
-from .utils.state import AgentState
+from .utils.state import INITIAL_SYSTEM_PROMPT, AgentState
 from .utils.subgraph import subgraph as food_subgraph
 
 builder = StateGraph(AgentState)
@@ -62,8 +63,17 @@ config: RunnableConfig = {"configurable": {"thread_id": 1}}
 
 
 def stream_graph_updates(user_input: str):
+    # ~~~~~ Add Initial System Message ~~~~~
+    existing_state = graph.get_state(config)
+    messages = []
+
+    if not existing_state.values.get("messages"):
+        messages.append(INITIAL_SYSTEM_PROMPT)
+
+    messages.append(HumanMessage(content=user_input))
+
     for event in graph.stream(
-        cast(AgentState, {"messages": [{"role": "user", "content": user_input}]}),
+        cast(AgentState, {"messages": messages}),
         config=config,
     ):
         for value in event.values():

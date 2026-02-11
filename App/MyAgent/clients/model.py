@@ -12,7 +12,7 @@ Answer: Let's think step by step."""
 prompt = PromptTemplate(template=template, input_variables=["question"])
 
 
-def get_model(model_name: str = "amazon/nova-2-lite-v1:free", temperature: float = 0.7):
+def get_model(model_name: str = "x-ai/grok-4-fast", temperature: float = 0.7):
     """
     Returns a chat model instance connected to OpenRouter.
     You can change 'model_name' to any model on OpenRouter.
@@ -26,7 +26,7 @@ def get_model(model_name: str = "amazon/nova-2-lite-v1:free", temperature: float
 
 
 # For Instructor-based structured output
-def get_instructor(model_name: str = "amazon/nova-2-lite-v1:free", message: str = ""):
+def get_instructor(model_name: str = "x-ai/grok-4-fast", message: str = ""):
     """
     Returns an Instructor model instance.
     You can change 'model_name' to any model supported by Instructor.
