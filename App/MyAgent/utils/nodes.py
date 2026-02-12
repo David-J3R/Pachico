@@ -44,19 +44,7 @@ def chatbot(state: AgentState):
     return {"messages": [answer]}
 
 
-# --- FOOD ENTRY NODE ---
-def food_entry(state: AgentState):
-    answer = model.invoke(state["messages"])
-    return {"messages": [answer]}
-
-
-# --- DATA REVIEW NODE ---
-def data_review(state: AgentState):
-    answer = model.invoke(state["messages"])
-    return {"messages": [answer]}
-
-
-# --- CHART REQUEST NODE ---
-def chart_request(state: AgentState):
-    answer = model.invoke(state["messages"])
-    return {"messages": [answer]}
+# # --- FOOD ENTRY NODE ---
+# def food_entry(state: AgentState):
+#     answer = model.invoke(state["messages"])
+#     return {"messages": [answer]}

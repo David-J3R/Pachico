@@ -31,6 +31,9 @@ desktop.ini
 .env
 
 
+# Exported user data
+exports/
+
 # Claude files
 .claude_history/
 CLAUDE.md

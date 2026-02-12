@@ -6,10 +6,10 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
 from .utils.checkpointer import memory
+from .utils.chart_subgraph import chart_subgraph
+from .utils.data_review_subgraph import data_review_subgraph
 from .utils.nodes import (
-    chart_request,
     chatbot,
-    data_review,
     pick_node,
     router_node,
 )
@@ -21,8 +21,8 @@ builder = StateGraph(AgentState)
 builder.add_node("router", router_node)
 builder.add_node("chatbot", chatbot)
 builder.add_node("food_entry", food_subgraph)
-builder.add_node("data_review", data_review)
-builder.add_node("chart_request", chart_request)
+builder.add_node("data_review", data_review_subgraph)
+builder.add_node("chart_request", chart_subgraph)
 
 
 builder.add_edge(START, "router")
