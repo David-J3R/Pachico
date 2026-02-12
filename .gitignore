@@ -34,6 +34,11 @@ desktop.ini
 # Exported user data
 exports/
 
+# Next.js
+App/web/node_modules/
+App/web/.next/
+App/web/bun.lock
+
 # Claude files
 .claude_history/
 CLAUDE.md

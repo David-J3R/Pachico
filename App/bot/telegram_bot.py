@@ -20,24 +20,28 @@ MAX_MESSAGE_LENGTH = 4096
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "Hey! I'm Pachico, your personal nutrition assistant.\n\n"
-        "Tell me what you ate, ask for charts, or export your food log.\n"
-        "Type /help for examples."
-    )
+    if update.message:
+        await update.message.reply_text(
+            "Hey! I'm Pachico, your personal nutrition assistant.\n\n"
+            "Tell me what you ate, ask for charts, or export your food log.\n"
+            "Type /help for examples."
+        )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "Here's what I can do:\n\n"
-        'Log food: "I had 2 eggs and toast for breakfast"\n'
-        'Review data: "How many calories did I eat today?"\n'
-        'Charts: "Show me a calorie chart for this week"\n'
-        'Export: "Export my food log as CSV"\n'
-    )
+    if update.message:
+        await update.message.reply_text(
+            "Here's what I can do:\n\n"
+            'Log food: "I had 2 eggs and toast for breakfast"\n'
+            'Review data: "How many calories did I eat today?"\n'
+            'Charts: "Show me a calorie chart for this week"\n'
+            'Export: "Export my food log as CSV"\n'
+        )
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.message is None or update.effective_chat is None:
+        return  # Ignore non-message updates
     text = update.message.text
     chat_id = update.effective_chat.id
 
