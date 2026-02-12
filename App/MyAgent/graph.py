@@ -1,19 +1,14 @@
-import os
-from typing import cast
-
-from langchain_core.messages import HumanMessage
-from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from .utils.checkpointer import memory
 from .utils.chart_subgraph import chart_subgraph
+from .utils.checkpointer import memory
 from .utils.data_review_subgraph import data_review_subgraph
 from .utils.nodes import (
     chatbot,
     pick_node,
     router_node,
 )
-from .utils.state import INITIAL_SYSTEM_PROMPT, AgentState
+from .utils.state import AgentState
 from .utils.subgraph import subgraph as food_subgraph
 
 builder = StateGraph(AgentState)
@@ -40,57 +35,17 @@ graph = builder.compile(checkpointer=memory)
 # -------------------------------------------
 # DRAW AND SAVE GRAPH
 # -------------------------------------------
-try:
-    # Get the current working directory
-    current_dir = os.getcwd()
-    file_path = os.path.join(current_dir, "Pachico_Graph.png")
+# try:
+#     # Get the current working directory
+#     current_dir = os.getcwd()
+#     file_path = os.path.join(current_dir, "Pachico_Graph.png")
 
-    # Save the graph to a file
-    png_data = graph.get_graph(xray=True).draw_mermaid_png()
+#     # Save the graph to a file
+#     png_data = graph.get_graph(xray=True).draw_mermaid_png()
 
-    with open(file_path, "wb") as f:
-        f.write(png_data)
+#     with open(file_path, "wb") as f:
+#         f.write(png_data)
 
-    print("Graph saved as Pachico_Graph.png")
-except Exception as e:
-    print("Error saving graph:", e)
-
-# -------------------------------------------
-# EXAMPLE USAGE
-# -------------------------------------------
-
-config: RunnableConfig = {"configurable": {"thread_id": 1}}
-
-
-def stream_graph_updates(user_input: str):
-    # ~~~~~ Add Initial System Message ~~~~~
-    existing_state = graph.get_state(config)
-    messages = []
-
-    if not existing_state.values.get("messages"):
-        messages.append(INITIAL_SYSTEM_PROMPT)
-
-    messages.append(HumanMessage(content=user_input))
-
-    for event in graph.stream(
-        cast(AgentState, {"messages": messages}),
-        config=config,
-    ):
-        for value in event.values():
-            # Check if 'messages' key exists in the value
-            if value.get("messages"):
-                print("Assistant:", value["messages"][-1].content)
-
-
-while True:
-    try:
-        user_input = input("User: ")
-        if user_input.lower() in ["quit", "exit", "q"]:
-            print("Goodbye!")
-            break
-
-        stream_graph_updates(user_input)
-    except (EOFError, KeyboardInterrupt):
-        # fallback if input() is not available
-        print("An exit signal was received. Exiting the program.")
-        break
+#     print("Graph saved as Pachico_Graph.png")
+# except Exception as e:
+#     print("Error saving graph:", e)
