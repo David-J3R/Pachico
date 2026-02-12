@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:\\\\Users\\\\David\\\\Dev\\\\Projects\\\\Pachico2\" log --all --oneline -- \"docker-compose.yml\")",
+      "Bash(git -C:*)"
+    ]
+  }
+}
