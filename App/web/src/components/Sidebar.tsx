@@ -25,7 +25,7 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Mobile backdrop */}
+      {/* Backdrop — mobile only */}
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/50 md:hidden"
@@ -34,9 +34,12 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`fixed z-50 top-0 left-0 h-full w-[260px] bg-bg-sidebar flex flex-col border-r border-border-primary transition-transform duration-200 md:relative md:translate-x-0 ${
-          open ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`
+          fixed z-50 top-0 left-0 h-full w-[260px] bg-bg-sidebar
+          flex flex-col border-r border-border-primary
+          transition-transform duration-200 ease-in-out
+          ${open ? "translate-x-0" : "-translate-x-full"}
+        `}
       >
         {/* Brand + New Chat */}
         <div className="p-3 space-y-1">

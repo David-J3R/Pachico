@@ -47,3 +47,16 @@ body {
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
 }
+
+@keyframes fall {
+  0% {
+    transform: translateY(-5vh) rotate(0deg);
+  }
+  100% {
+    transform: translateY(105vh) rotate(360deg);
+  }
+}
+
+.animate-fall {
+  animation: fall linear infinite;
+}

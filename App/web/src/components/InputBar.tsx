@@ -5,9 +5,10 @@ import { useState, useRef, useCallback, KeyboardEvent } from "react";
 interface InputBarProps {
   onSend: (content: string) => void;
   disabled: boolean;
+  onFocus?: () => void;
 }
 
-export default function InputBar({ onSend, disabled }: InputBarProps) {
+export default function InputBar({ onSend, disabled, onFocus }: InputBarProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -51,6 +52,7 @@ export default function InputBar({ onSend, disabled }: InputBarProps) {
             rows={1}
             className="flex-1 resize-none bg-transparent px-2 py-1.5 text-text-primary placeholder:text-text-placeholder outline-none text-sm leading-relaxed"
             disabled={disabled}
+            onFocus={onFocus}
           />
           <button
             onClick={handleSend}

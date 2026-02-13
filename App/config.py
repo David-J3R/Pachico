@@ -19,7 +19,7 @@ class GlobalConfig(BaseConfig):
     DATABASE_URL: str = "sqlite:///nutrition_logs.db"
     DB_FORCE_ROLL_BACK: bool = False
 
-    # PostgreSQL connection fields (values must come from .env)
+    # PostgreSQL connection fields
     POSTGRE_USER: str
     POSTGRE_PASSWORD: str
     POSTGRE_HOST: str = "127.0.0.1"

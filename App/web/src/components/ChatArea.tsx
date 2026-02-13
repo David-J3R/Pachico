@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Conversation } from "@/lib/types";
 import MessageBubble from "./MessageBubble";
 import LoadingDots from "./LoadingDots";
 import InputBar from "./InputBar";
+import FallingEmojis from "./FallingEmojis";
 
 interface ChatAreaProps {
   conversation: Conversation | null;
@@ -22,15 +23,24 @@ export default function ChatArea({
   onNewChat,
 }: ChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [inputFocused, setInputFocused] = useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation?.messages.length, isLoading]);
 
+  // Reset focus state when switching conversations
+  useEffect(() => {
+    setInputFocused(false);
+  }, [conversation?.threadId]);
+
+  const isEmpty = !conversation || conversation.messages.length === 0;
+  const showEmojis = isEmpty && !inputFocused;
+
   return (
-    <div className="flex flex-1 flex-col h-screen min-w-0">
+    <div className="flex flex-1 flex-col h-screen min-w-0 relative">
       {/* Header */}
-      <header className="flex items-center gap-3 border-b border-border-primary px-4 py-3">
+      <header className="flex items-center gap-3 border-b border-border-primary px-4 py-3 z-10 bg-bg-primary">
         <button
           onClick={onToggleSidebar}
           className="rounded p-1.5 text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors"
@@ -50,30 +60,42 @@ export default function ChatArea({
       </header>
 
       {/* Messages or empty state */}
-      {!conversation || conversation.messages.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/photos/Pachico.png"
-            alt="Pachico"
-            className="w-32 h-32 rounded-full object-cover border-2 border-accent-primary shadow-lg"
-          />
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-semibold text-text-primary">
-              What are we eating today?
-            </h2>
-            <p className="text-sm text-text-secondary max-w-sm">
-              I&apos;m Pachico — part nutritionist, part gym bro, full-time pear enthusiast. Let&apos;s get your diet in check.
-            </p>
+      {isEmpty ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4 relative">
+          {/* Cascading food emojis */}
+          <div
+            className={`transition-opacity duration-500 ${
+              showEmojis ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <FallingEmojis />
           </div>
-          {!conversation && (
-            <button
-              onClick={onNewChat}
-              className="mt-2 rounded-lg bg-accent-primary px-4 py-2 text-sm text-white hover:bg-accent-hover transition-colors"
-            >
-              Start a conversation
-            </button>
-          )}
+
+          {/* Welcome content */}
+          <div className="z-10 flex flex-col items-center gap-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/photos/Pachico.png"
+              alt="Pachico"
+              className="w-32 h-32 rounded-full object-cover border-2 border-accent-primary shadow-lg"
+            />
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-semibold text-text-primary">
+                What are we eating today?
+              </h2>
+              <p className="text-sm text-text-secondary max-w-sm">
+                I&apos;m Pachico, the best nutritionist coach, full-time pear enthusiast. Let&apos;s get your diet in check.
+              </p>
+            </div>
+            {!conversation && (
+              <button
+                onClick={onNewChat}
+                className="mt-2 rounded-lg bg-accent-primary px-4 py-2 text-sm text-white hover:bg-accent-hover transition-colors"
+              >
+                Start a conversation
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto px-4 py-4">
@@ -88,7 +110,13 @@ export default function ChatArea({
       )}
 
       {/* Input bar — only show when conversation is active */}
-      {conversation && <InputBar onSend={onSend} disabled={isLoading} />}
+      {conversation && (
+        <InputBar
+          onSend={onSend}
+          disabled={isLoading}
+          onFocus={() => setInputFocused(true)}
+        />
+      )}
     </div>
   );
 }
