@@ -1,5 +1,7 @@
 # Pachico
 
+![Pachico](https://github.com/user-attachments/assets/6460603f-7531-4521-a52e-0ba4355def17)
+
 Pachico is the ultimate AI nutrition coach built with LangGraph. You can either use it via telegram, CLI or browser. 
 Pachico Capabilities:
 - Food logs
